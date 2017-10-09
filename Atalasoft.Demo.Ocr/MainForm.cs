@@ -303,7 +303,16 @@ namespace Atalasoft.Demo.Ocr
 
             try
             {
-                File.Delete(TempFile);
+                if (File.Exists(TempFile))
+                {
+                    if ((File.GetAttributes(TempFile) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    {
+                        File.SetAttributes(TempFile, FileAttributes.Normal);
+                    }
+
+                    File.Delete(TempFile);
+                }
+                                               
                 File.Copy(_openFileDialog.FileName, TempFile, true);
             }
             catch (Exception ex)
