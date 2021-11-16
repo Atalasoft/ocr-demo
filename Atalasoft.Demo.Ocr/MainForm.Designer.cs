@@ -61,8 +61,8 @@ namespace Atalasoft.Demo.Ocr
             this._menuActionTranslate = new System.Windows.Forms.MenuItem();
             this._menuEngine = new System.Windows.Forms.MenuItem();
             this._menuGlyphReaderEngine = new System.Windows.Forms.MenuItem();
-            this._menuTesseract = new System.Windows.Forms.MenuItem();
             this._menuTesseract3 = new System.Windows.Forms.MenuItem();
+            this._menuOmniPage = new System.Windows.Forms.MenuItem();
             this._menuLanguage = new System.Windows.Forms.MenuItem();
             this._menuHelp = new System.Windows.Forms.MenuItem();
             this._menuHelpAbout = new System.Windows.Forms.MenuItem();
@@ -70,7 +70,6 @@ namespace Atalasoft.Demo.Ocr
             this._openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this._progressBar = new System.Windows.Forms.ProgressBar();
             this._splitter = new System.Windows.Forms.Splitter();
-            this._menuAbbyy = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // _textBox
@@ -80,7 +79,7 @@ namespace Atalasoft.Demo.Ocr
             this._textBox.Multiline = true;
             this._textBox.Name = "_textBox";
             this._textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._textBox.Size = new System.Drawing.Size(449, 649);
+            this._textBox.Size = new System.Drawing.Size(374, 649);
             this._textBox.TabIndex = 2;
             // 
             // _mainMenu
@@ -155,9 +154,8 @@ namespace Atalasoft.Demo.Ocr
             this._menuEngine.Index = 2;
             this._menuEngine.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this._menuGlyphReaderEngine,
-            this._menuTesseract,
             this._menuTesseract3,
-            this._menuAbbyy});
+            this._menuOmniPage});
             this._menuEngine.Text = "Engine";
             // 
             // _menuGlyphReaderEngine
@@ -166,17 +164,17 @@ namespace Atalasoft.Demo.Ocr
             this._menuGlyphReaderEngine.Text = "GlyphReader";
             this._menuGlyphReaderEngine.Click += new System.EventHandler(this.OnMenuGlyphReaderEngineClick);
             // 
-            // _menuTesseract
-            // 
-            this._menuTesseract.Index = 1;
-            this._menuTesseract.Text = "Tesseract 2";
-            this._menuTesseract.Click += new System.EventHandler(this.OnMenuTesseractClick);
-            // 
             // _menuTesseract3
             // 
-            this._menuTesseract3.Index = 2;
+            this._menuTesseract3.Index = 1;
             this._menuTesseract3.Text = "Tesseract 3";
             this._menuTesseract3.Click += new System.EventHandler(this.OnMenuTesseract3Click);
+            // 
+            // _menuOmniPage
+            // 
+            this._menuOmniPage.Index = 2;
+            this._menuOmniPage.Text = "OmniPage";
+            this._menuOmniPage.Click += new System.EventHandler(this.OnMenuOmniPageClick);
             // 
             // _menuLanguage
             // 
@@ -204,14 +202,14 @@ namespace Atalasoft.Demo.Ocr
             this._workspaceViewer.AntialiasDisplay = Atalasoft.Imaging.WinControls.AntialiasDisplayMode.ReductionOnly;
             this._workspaceViewer.AutoZoom = Atalasoft.Imaging.WinControls.AutoZoomMode.BestFitShrinkOnly;
             this._workspaceViewer.DisplayProfile = null;
-            this._workspaceViewer.Location = new System.Drawing.Point(468, 0);
+            this._workspaceViewer.Location = new System.Drawing.Point(390, 0);
             this._workspaceViewer.Magnifier.BackColor = System.Drawing.Color.White;
             this._workspaceViewer.Magnifier.BorderColor = System.Drawing.Color.Black;
             this._workspaceViewer.Magnifier.Size = new System.Drawing.Size(100, 100);
             this._workspaceViewer.Name = "_workspaceViewer";
             this._workspaceViewer.OutputProfile = null;
             this._workspaceViewer.Selection = null;
-            this._workspaceViewer.Size = new System.Drawing.Size(550, 611);
+            this._workspaceViewer.Size = new System.Drawing.Size(629, 617);
             this._workspaceViewer.TabIndex = 3;
             this._workspaceViewer.Text = "workspaceViewer1";
             // 
@@ -219,30 +217,24 @@ namespace Atalasoft.Demo.Ocr
             // 
             this._progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._progressBar.Location = new System.Drawing.Point(468, 618);
+            this._progressBar.Location = new System.Drawing.Point(390, 623);
             this._progressBar.Name = "_progressBar";
-            this._progressBar.Size = new System.Drawing.Size(550, 19);
+            this._progressBar.Size = new System.Drawing.Size(629, 16);
             this._progressBar.TabIndex = 4;
             this._progressBar.Visible = false;
             // 
             // _splitter
             // 
-            this._splitter.Location = new System.Drawing.Point(449, 0);
+            this._splitter.Location = new System.Drawing.Point(374, 0);
             this._splitter.Name = "_splitter";
-            this._splitter.Size = new System.Drawing.Size(12, 649);
+            this._splitter.Size = new System.Drawing.Size(10, 649);
             this._splitter.TabIndex = 5;
             this._splitter.TabStop = false;
             this._splitter.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
             // 
-            // _menuAbbyy
-            // 
-            this._menuAbbyy.Index = 3;
-            this._menuAbbyy.Text = "ABBYY";
-            this._menuAbbyy.Click += new System.EventHandler(this.OnMenuAbbyyClick);
-            // 
             // MainForm
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(6, 15);
+            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(1027, 649);
             this.Controls.Add(this._splitter);
             this.Controls.Add(this._progressBar);
@@ -278,9 +270,8 @@ namespace Atalasoft.Demo.Ocr
         private MenuItem _menuEngine;
         private MenuItem _menuGlyphReaderEngine;
         private Splitter _splitter;
-        private MenuItem _menuTesseract;
         private MenuItem _menuLanguage;
         private MenuItem _menuTesseract3;
-        private MenuItem _menuAbbyy;
+        private MenuItem _menuOmniPage;
     }
 }

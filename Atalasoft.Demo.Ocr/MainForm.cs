@@ -15,9 +15,9 @@ using System.Windows.Forms;
 using Atalasoft.Imaging;
 using Atalasoft.Imaging.Codec;
 using Atalasoft.Ocr;
-using Atalasoft.Ocr.Abbyy;
 using Atalasoft.Ocr.GlyphReader;
 using Atalasoft.Ocr.Tesseract;
+using Atalasoft.Ocr.OmniPage;
 using Microsoft.Win32;
 
 namespace Atalasoft.Demo.Ocr
@@ -33,7 +33,8 @@ namespace Atalasoft.Demo.Ocr
         private bool _validLicense;
         private static readonly string TempDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Atalasoft\Demos\OCR_temp");
         private static readonly string TempFile = Path.Combine(TempDir, "temp");
-        private static string _outputFile = Path.Combine(TempDir, "output.txt");
+        private static readonly string DefaultOutputFile = Path.Combine(TempDir, "output.txt");
+        private static string _outputFile = DefaultOutputFile;
         private string _selectedMimeType = "";
         private bool _fileLoaded;
 
@@ -41,7 +42,7 @@ namespace Atalasoft.Demo.Ocr
         private OcrEngine _tesseract;       // Tesseract ditto
         private OcrEngine _tesseract3;      // This is the new (as of 10.4.1) Tesseract 3 engine
         private OcrEngine _glyphReader;     // GlyphReader likewise
-        private OcrEngine _abbyy;           // ABBYY FineReader
+        private OcrEngine _omniPage;        // OmniPage
 
         private bool _saveToFile;
 
@@ -111,29 +112,66 @@ namespace Atalasoft.Demo.Ocr
             {
                 switch (s)
                 {
-                    case "text/plain": mimeFilter += s + " (.txt)|*.txt|";
+                    case "text/plain":
+                        mimeFilter += s + " (.txt)|*.txt|";
                         break;
-                    case "text/html": mimeFilter += s + " (.htm,.html)|*.htm;*.html|";
+                    case "text/html":
+                        mimeFilter += s + " (.htm,.html)|*.htm;*.html|";
                         break;
-                    case "text/richtext": mimeFilter += s + " (.rtf)|*.rtf|";
+                    case "text/richtext":
+                        mimeFilter += s + " (.rtf)|*.rtf|";
                         break;
-                    case "image/x-amidraw": mimeFilter += s + " (.txt)|*.txt|";
+                    case "image/x-amidraw":
+                        mimeFilter += s + " (.txt)|*.txt|";
                         break;
-                    case "application/pdf": mimeFilter += s + " (.pdf)|*.pdf|";
+                    case "application/pdf":
+                        mimeFilter += s + " (.pdf)|*.pdf|";
                         break;
-                    case "application/msword": mimeFilter += s + " (.doc)|*.doc|";
+                    case "application/msword":
+                        mimeFilter += s + " (.doc)|*.doc|";
                         break;
-                    case "application/wordperfect": mimeFilter += s + " (.wpd)|*.wpd|";
+                    case "application/wordperfect":
+                        mimeFilter += s + " (.wpd)|*.wpd|";
                         break;
-                    case "text/tab-separated-values": mimeFilter += s + " (.txt)|*.txt|";
+                    case "text/tab-separated-values":
+                        mimeFilter += s + " (.txt)|*.txt|";
                         break;
-                    case "text/csv": mimeFilter += s + " (.csv)|*.csv|";
+                    case "text/csv":
+                        mimeFilter += s + " (.csv)|*.csv|";
                         break;
-                    case "text/comma-separated-values": mimeFilter += s + " (.csv)|*.csv|";
+                    case "text/comma-separated-values":
+                        mimeFilter += s + " (.csv)|*.csv|";
                         break;
-                    case "application/vnd.lotus-1-2-3": mimeFilter += s + " (.txt)|*.txt|";
+                    case "application/vnd.lotus-1-2-3":
+                        mimeFilter += s + " (.txt)|*.txt|";
                         break;
-                    default: mimeFilter += s + " (.???)|*.*|";
+                    case "application/epub+zip":
+                        mimeFilter += s + " (.epub)|*.epub|";
+                        break;
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                        mimeFilter += s + " (.docx)|*.docx|";
+                        break;
+                    case "application/vnd.ms-excel":
+                    case "application/excel":
+                        mimeFilter += s + " (.xls)|*.xls|";
+                        break;
+                    case "application/vnd.ms-powerpoint":
+                        mimeFilter += s + " (.ppt)|*.ppt|";
+                        break;
+                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                        mimeFilter += s + " (.pptx)|*.pptx|";
+                        break;
+                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                        mimeFilter += s + " (.xlsx)|*.xlsx|";
+                        break;
+                    case "text/xml":
+                        mimeFilter += s + " (.xml)|*.xml|";
+                        break;
+                    case "application/vnd.ms-xpsdocument":
+                        mimeFilter += s + " (.xps)|*.xps|";
+                        break;
+                    default:
+                        mimeFilter += s + " (.???)|*.*|";
                         break;
                 }
             }
@@ -397,19 +435,6 @@ namespace Atalasoft.Demo.Ocr
             }
         }
 
-        private void OnMenuTesseractClick(object sender, EventArgs e)
-        {
-            try
-            {
-                SelectTesseractEngine();
-            }
-            catch (AtalasoftLicenseException ex)
-            {
-                LicenseCheckFailure("Using Tesseract OCR requires a DotImage OCR License.", ex.Message);
-            }
-
-        }
-
         private void OnMenuTesseract3Click(object sender, EventArgs e)
         {
             try
@@ -422,35 +447,46 @@ namespace Atalasoft.Demo.Ocr
             }
         }
 
-        private void OnMenuAbbyyClick(object sender, EventArgs e)
+        private void SelectOmniPageEngine()
         {
-            try
+            if (_omniPage == null)
             {
-                // TODO: you may want to change the location of ABBYY OCR resource files below
-                var currentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);               
-                var loader = new AbbyyLoader(Path.Combine(currentFolder, "Abbyy"));
+                try
+                {
+                    OmniPageLoader loader = new OmniPageLoader();
+                    if (loader != null)
+                    {
+                        // try to create an OmniPage engine
+                        _omniPage = new OmniPageEngine();
+                        InitializeEngine(_omniPage);
+                    }
+                }
+                catch (AtalasoftLicenseException ex)
+                {
+                    LicenseCheckFailure("Using OmniPage OCR requires both an Atalasoft DotImage OCR License.", ex.Message);
+                }
+                catch (Exception err)
+                {
+                    InfoBox(err.Message);
+                }
+            }
+            if (_omniPage != null)
+            {
+                _engine = _omniPage;
+                UpdateMenusForEngine();
+            }
+        }
 
-                if (loader.Loaded)
-                {
-                    SelectAbbyyEngine();
-                }
-                else
-                {
-                    InfoBox("Unable to load ABBYY OCR engine resource files. Make sure that you downloaded the engine as described in KB article: http://www.atalasoft.com/KB/Article.aspx?id=10432");
-                }
-            }
-            catch (AtalasoftLicenseException ex)
-            {
-                LicenseCheckFailure("Using ABBYY OCR requires a DotImage OCR License.", ex.Message);
-            }
+        private void OnMenuOmniPageClick(object sender, EventArgs e)
+        {
+            SelectOmniPageEngine();
         }
 
         private void UpdateMenusForEngine()
         {
             _menuGlyphReaderEngine.Checked = (_engine == _glyphReader);
-            _menuTesseract.Checked = (_engine == _tesseract);
             _menuTesseract3.Checked = (_engine == _tesseract3);
-            _menuAbbyy.Checked = (_engine == _abbyy);
+            _menuOmniPage.Checked = (_engine == _omniPage);
             // Fill in the menu of supported recognition languages/cultures:
             CreateLanguageMenu();
             // Adds the list of supported output formats to the 'Action' menu.
@@ -511,7 +547,7 @@ namespace Atalasoft.Demo.Ocr
                     "style (or mime type) can be formatted as any of the supported types.  " +
                     "This is a great place to get started with DotImage OCR.  " +
                     "Requires evaluation or purchased licenses of DotImage Document Imaging, " +
-                    "and at least one of these OCR Add-ons: GlyphReader or Tesseract."
+                    "and at least one of these OCR Add-ons: GlyphReader, OmniPage or Tesseract."
             };
             aboutBox.ShowDialog();
         }
@@ -534,20 +570,6 @@ namespace Atalasoft.Demo.Ocr
             }
         }
 
-        private void SelectTesseractEngine()
-        {
-            if (_tesseract == null)
-            {
-                _tesseract = new TesseractEngine();
-                InitializeEngine(_tesseract);
-            }
-            if (_tesseract != null)
-            {
-                _engine = _tesseract;
-                UpdateMenusForEngine();
-            }
-        }
-
         private void SelectTesseract3Engine()
         {
             if (_tesseract3 == null)
@@ -558,20 +580,6 @@ namespace Atalasoft.Demo.Ocr
             if (_tesseract3 != null)
             {
                 _engine = _tesseract3;
-                UpdateMenusForEngine();
-            }
-        }
-
-        private void SelectAbbyyEngine()
-        {
-            if (_abbyy == null)
-            {
-                _abbyy = new AbbyyEngine();
-                InitializeEngine(_abbyy);
-            }
-            if (_abbyy != null)
-            {
-                _engine = _abbyy;
                 UpdateMenusForEngine();
             }
         }
@@ -605,6 +613,7 @@ namespace Atalasoft.Demo.Ocr
                 try
                 {
                     _textBox.Clear();
+                    _outputFile = DefaultOutputFile;
 
                     // choose output file location, either a temp directory, or a user selected spot.
                     if (_saveToFile)
@@ -642,7 +651,17 @@ namespace Atalasoft.Demo.Ocr
                     }
                     else
                     {
-                        Process.Start(_outputFile);
+                        try
+                        {
+                            Process.Start(_outputFile);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (File.Exists(_outputFile))
+                                InfoBox("File \"" + _outputFile + "\" is created.");
+                            else
+                                InfoBox(ex.ToString());
+                        }
                     }
                 }
                 catch (Exception ex)
