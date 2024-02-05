@@ -1,6 +1,6 @@
 // ------------------------------------------------------------------------------------
 // <copyright file="MainForm.cs" company="Atalasoft">
-//     (c) 2000-2015 Atalasoft, a Kofax Company. All rights reserved. Use is subject to license terms.
+//     (c) 2000-2024 Atalasoft, a Kofax Company. All rights reserved. Use is subject to license terms.
 // </copyright>
 // ------------------------------------------------------------------------------------
 
@@ -41,6 +41,7 @@ namespace Atalasoft.Demo.Ocr
         private OcrEngine _engine;          // currently selected engine
         private OcrEngine _tesseract;       // Tesseract ditto
         private OcrEngine _tesseract3;      // This is the new (as of 10.4.1) Tesseract 3 engine
+        private OcrEngine _tesseract5;      // This is the new (as of 10.4.1) Tesseract 3 engine
         private OcrEngine _glyphReader;     // GlyphReader likewise
         private OcrEngine _omniPage;        // OmniPage
 
@@ -443,7 +444,19 @@ namespace Atalasoft.Demo.Ocr
             }
             catch (AtalasoftLicenseException ex)
             {
-                LicenseCheckFailure("Using Tesseract OCR requires a DotImage OCR License.", ex.Message);
+                LicenseCheckFailure("Using Tesseract3 OCR requires a DotImage OCR License.", ex.Message);
+            }
+        }
+
+        private void OnMenuTesseract5Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SelectTesseract5Engine();
+            }
+            catch (AtalasoftLicenseException ex)
+            {
+                LicenseCheckFailure("Using Tesseract5 OCR requires a DotImage OCR License.", ex.Message);
             }
         }
 
@@ -486,6 +499,7 @@ namespace Atalasoft.Demo.Ocr
         {
             _menuGlyphReaderEngine.Checked = (_engine == _glyphReader);
             _menuTesseract3.Checked = (_engine == _tesseract3);
+            _menuTesseract5.Checked = (_engine == _tesseract5);
             _menuOmniPage.Checked = (_engine == _omniPage);
             // Fill in the menu of supported recognition languages/cultures:
             CreateLanguageMenu();
@@ -580,6 +594,20 @@ namespace Atalasoft.Demo.Ocr
             if (_tesseract3 != null)
             {
                 _engine = _tesseract3;
+                UpdateMenusForEngine();
+            }
+        }
+
+        private void SelectTesseract5Engine()
+        {
+            if (_tesseract5 == null)
+            {
+                _tesseract5 = new Tesseract5Engine();
+                InitializeEngine(_tesseract5);
+            }
+            if (_tesseract5 != null)
+            {
+                _engine = _tesseract5;
                 UpdateMenusForEngine();
             }
         }
@@ -708,6 +736,10 @@ namespace Atalasoft.Demo.Ocr
             if (_tesseract3 != null)
             {
                 _tesseract3.ShutDown();
+            }
+            if (_tesseract5 != null)
+            {
+                _tesseract5.ShutDown();
             }
             if (_glyphReader != null)
             {

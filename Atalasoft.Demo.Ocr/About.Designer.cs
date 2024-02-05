@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------
 // <copyright file="About.Designer.cs" company="Atalasoft">
-//     (c) 2000-2015 Atalasoft, a Kofax Company. All rights reserved. Use is subject to license terms.
+//     (c) 2000-2024 Atalasoft, a Kofax Company. All rights reserved. Use is subject to license terms.
 // </copyright>
 // ------------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------
 // <copyright file="MainForm.Designer.cs" company="Atalasoft">
-//     (c) 2000-2015 Atalasoft, a Kofax Company. All rights reserved. Use is subject to license terms.
+//     (c) 2000-2024 Atalasoft, a Kofax Company. All rights reserved. Use is subject to license terms.
 // </copyright>
 // ------------------------------------------------------------------------------------
 
@@ -62,6 +62,7 @@ namespace Atalasoft.Demo.Ocr
             this._menuEngine = new System.Windows.Forms.MenuItem();
             this._menuGlyphReaderEngine = new System.Windows.Forms.MenuItem();
             this._menuTesseract3 = new System.Windows.Forms.MenuItem();
+            this._menuTesseract5 = new System.Windows.Forms.MenuItem();
             this._menuOmniPage = new System.Windows.Forms.MenuItem();
             this._menuLanguage = new System.Windows.Forms.MenuItem();
             this._menuHelp = new System.Windows.Forms.MenuItem();
@@ -155,6 +156,7 @@ namespace Atalasoft.Demo.Ocr
             this._menuEngine.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this._menuGlyphReaderEngine,
             this._menuTesseract3,
+            this._menuTesseract5,
             this._menuOmniPage});
             this._menuEngine.Text = "Engine";
             // 
@@ -170,9 +172,15 @@ namespace Atalasoft.Demo.Ocr
             this._menuTesseract3.Text = "Tesseract 3";
             this._menuTesseract3.Click += new System.EventHandler(this.OnMenuTesseract3Click);
             // 
+            // _menuTesseract5
+            // 
+            this._menuTesseract5.Index = 2;
+            this._menuTesseract5.Text = "Tesseract 5";
+            this._menuTesseract5.Click += new System.EventHandler(this.OnMenuTesseract5Click);
+            // 
             // _menuOmniPage
             // 
-            this._menuOmniPage.Index = 2;
+            this._menuOmniPage.Index = 3;
             this._menuOmniPage.Text = "OmniPage";
             this._menuOmniPage.Click += new System.EventHandler(this.OnMenuOmniPageClick);
             // 
@@ -272,6 +280,7 @@ namespace Atalasoft.Demo.Ocr
         private Splitter _splitter;
         private MenuItem _menuLanguage;
         private MenuItem _menuTesseract3;
+        private MenuItem _menuTesseract5;
         private MenuItem _menuOmniPage;
     }
 }
